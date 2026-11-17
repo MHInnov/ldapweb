@@ -1,0 +1,19 @@
+{% import "macros.html" as m %}
+<table class="grid compact">
+<tbody>
+{% for r in rows %}
+<tr>
+  {% if mode == "multi" %}
+  <td class="chk"><input type="checkbox" name="pick" value="{{ r.dn }}" id="pk-{{ uid }}-{{ loop.index }}"></td>
+  <td><label for="pk-{{ uid }}-{{ loop.index }}" class="name">{% call m::kicon(r.icon) %}{% endcall %}{{ r.name }}</label></td>
+  {% else %}
+  <td><a href="#" class="name" data-pick="{{ r.dn }}" data-pick-target="{{ target }}">{% call m::kicon(r.icon) %}{% endcall %}{{ r.name }}</a></td>
+  {% endif %}
+  <td class="small muted">{{ r.detail }}</td>
+  <td class="small faint">{{ r.location }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% if rows.is_empty() %}<div class="empty">{% if q.is_empty() %}Saisissez un nom pour rechercher.{% else %}Aucun résultat.{% endif %}</div>{% endif %}
+{% if truncated %}<div class="small muted" style="padding:6px 10px">Résultats limités à 100 — affinez la recherche.</div>{% endif %}

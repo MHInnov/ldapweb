@@ -1,0 +1,29 @@
+{% import "macros.html" as m %}
+<form hx-post="/obj/tab?dn={{ dn|urlencode }}&tab={{ tab }}" hx-target="this" hx-swap="outerHTML">
+  {% if !note.is_empty() %}<div class="notice">{{ note }}</div>{% endif %}
+  <div class="form-grid">
+  {% for f in fields %}
+    <label for="{{ f.id }}">{{ f.label }}<div class="faint small mono">{{ f.attr }}</div></label>
+    {% if f.kind == "ro" %}
+      <input type="text" id="{{ f.id }}" readonly value="{{ f.value }}">
+    {% else if f.kind == "area" %}
+      <textarea name="a.{{ f.attr }}" id="{{ f.id }}" rows="3">{{ f.value }}</textarea>
+    {% else if f.kind == "lines" %}
+      <textarea name="a.{{ f.attr }}" id="{{ f.id }}" rows="3" placeholder="une valeur par ligne">{{ f.value }}</textarea>
+    {% else if f.kind == "dn" %}
+      <div class="inline">
+        <input type="text" name="a.{{ f.attr }}" id="{{ f.id }}" value="{{ f.value }}" class="mono">
+        <button type="button" class="btn-sm" hx-get="/pick?mode=single&target={{ f.id }}&kinds={{ f.pick_kinds }}" hx-target="#modal2" title="Choisir">…</button>
+        <button type="button" class="btn-sm" data-action="clear-field" data-target="{{ f.id }}" title="Effacer">{% call m::icon("close") %}{% endcall %}</button>
+      </div>
+    {% else if f.kind == "select" %}
+      <select name="a.{{ f.attr }}" id="{{ f.id }}">
+        {% for o in f.options %}<option value="{{ o.0 }}" {% if o.0 == f.value %}selected{% endif %}>{{ o.1 }}</option>{% endfor %}
+      </select>
+    {% else %}
+      <input type="text" name="a.{{ f.attr }}" id="{{ f.id }}" value="{{ f.value }}">
+    {% endif %}
+  {% endfor %}
+  </div>
+  {% if editable %}<div class="form-actions"><button type="submit" class="btn-primary">Enregistrer</button></div>{% endif %}
+</form>

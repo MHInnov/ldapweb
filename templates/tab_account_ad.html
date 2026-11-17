@@ -1,0 +1,38 @@
+{% import "macros.html" as m %}
+<form hx-post="/obj/account?dn={{ dn|urlencode }}" hx-target="this" hx-swap="outerHTML">
+  <div class="row wrap" style="margin-bottom:12px">
+    {% if disabled %}<span class="badge muted">Compte désactivé</span>{% else %}<span class="badge ok">Compte actif</span>{% endif %}
+    {% if locked %}<span class="badge danger">Verrouillé</span> <button type="button" class="btn-sm" hx-post="/obj/state?op=unlock&dn={{ dn|urlencode }}" hx-swap="none">{% call m::icon("unlock") %}{% endcall %} Déverrouiller</button>{% endif %}
+    {% if pwd_expired %}<span class="badge warn">Mot de passe expiré</span>{% endif %}
+    {% if expired %}<span class="badge warn">Compte expiré</span>{% endif %}
+  </div>
+  <div class="form-grid">
+    {% if is_user %}
+    <label>Nom d'ouverture de session</label>
+    <div class="inline"><input type="text" name="upn_prefix" value="{{ upn_prefix }}"><span>@</span>
+      <select name="upn_suffix" style="max-width:260px">{% for s in suffixes %}<option {% if *s == upn_suffix %}selected{% endif %}>{{ s }}</option>{% endfor %}</select></div>
+    {% endif %}
+    <label>Nom (antérieur à Windows 2000)</label>
+    <div class="inline"><span class="muted nowrap">{{ netbios }}\</span><input type="text" name="sam" value="{{ sam }}" {% if !is_user %}readonly{% endif %}></div>
+    {% if is_user %}
+    <label>Postes autorisés</label>
+    <input type="text" name="workstations" value="{{ workstations }}" placeholder="vide = tous (séparés par des virgules)">
+    {% endif %}
+  </div>
+  <h3>Options du compte</h3>
+  <div class="checks">
+    {% for o in options %}
+    <label><input type="checkbox" name="{{ o.0 }}" {% if o.2 %}checked{% endif %}> <span>{{ o.1 }}</span></label>
+    {% endfor %}
+  </div>
+  {% if is_user %}
+  <h3>Expiration du compte</h3>
+  <div class="checks">
+    <label><input type="radio" name="expires" value="never" {% if expires_date.is_empty() %}checked{% endif %}> Jamais</label>
+    <label><input type="radio" name="expires" value="date" {% if !expires_date.is_empty() %}checked{% endif %}> Fin de journée le : <input type="date" name="expires_date" value="{{ expires_date }}" style="width:auto"></label>
+  </div>
+  {% endif %}
+  <h3>Informations</h3>
+  <dl class="kv">{% for r in facts %}<dt>{{ r.0 }}</dt><dd>{{ r.1 }}</dd>{% endfor %}</dl>
+  <div class="form-actions"><button type="submit" class="btn-primary">Enregistrer</button></div>
+</form>

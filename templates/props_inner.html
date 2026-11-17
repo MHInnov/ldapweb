@@ -1,0 +1,18 @@
+<div class="props-head">
+  <svg class="i xl kind-icon {{ p.icon }}"><use href="/static/icons.svg#{{ p.icon }}"></use></svg>
+  <div class="title">
+    <div style="font-size:16px;font-weight:600">{{ p.name }} <span class="badge">{{ p.kind_label }}</span>{% for b in p.badges %} <span class="badge {{ b.0 }}">{{ b.1 }}</span>{% endfor %}</div>
+    <div class="dn">{{ p.dn }}</div>
+  </div>
+</div>
+<div class="props-actions">
+{% for act in p.actions %}
+  {% if act.method == "post" %}
+  <button class="btn-sm {{ act.class }}" hx-post="{{ act.url }}" hx-swap="none" {% if !act.confirm.is_empty() %}hx-confirm="{{ act.confirm }}"{% endif %}><svg class="i"><use href="/static/icons.svg#{{ act.icon }}"></use></svg> {{ act.label }}</button>
+  {% else if act.method == "link" %}
+  <a class="btn btn-sm {{ act.class }}" href="{{ act.url }}"><svg class="i"><use href="/static/icons.svg#{{ act.icon }}"></use></svg> {{ act.label }}</a>
+  {% else %}
+  <button class="btn-sm {{ act.class }}" hx-get="{{ act.url }}" hx-target="#modal2"><svg class="i"><use href="/static/icons.svg#{{ act.icon }}"></use></svg> {{ act.label }}</button>
+  {% endif %}
+{% endfor %}
+</div>

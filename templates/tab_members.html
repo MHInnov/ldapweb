@@ -1,0 +1,26 @@
+{% import "macros.html" as m %}
+<div data-selection-scope id="members-{{ uid }}">
+  <div class="row" style="margin-bottom:10px">
+    <button class="btn-sm btn-primary" hx-get="/pick?mode=multi&kinds=user,group,computer,contact&action={{ add_action|urlencode }}&title=Ajouter%20des%20membres" hx-target="#modal2">{% call m::icon("plus") %}{% endcall %} Ajouter…</button>
+    <button class="btn-sm btn-danger" data-needs-selection disabled hx-post="/obj/members?op=remove&group={{ dn|urlencode }}" hx-include="#mf-{{ uid }}" hx-swap="none" hx-confirm="Retirer les membres sélectionnés ?">{% call m::icon("trash") %}{% endcall %} Retirer</button>
+    <span class="spacer"></span><span class="muted small">{{ rows.len() }} membre(s) · attribut <code>{{ attr }}</code></span><span class="small muted" data-selection-count></span>
+  </div>
+  <form id="mf-{{ uid }}">
+  <div class="table-wrap" style="max-height:420px">
+  <table class="grid compact" data-selectable>
+    <thead><tr><th class="chk"><input type="checkbox" data-action="select-all"></th><th>Nom</th><th>Type</th><th>Détail</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+    <tr>
+      <td class="chk">{% if !r.primary %}<input type="checkbox" name="dn" value="{{ r.dn }}">{% endif %}</td>
+      <td><span class="name">{% call m::kicon(r.icon) %}{% endcall %}{% if r.dn.contains("=") %}<a class="obj-name" hx-get="/obj/props?dn={{ r.dn|urlencode }}" hx-target="#modal2">{{ r.name }}</a>{% else %}{{ r.name }}{% endif %}</span></td>
+      <td class="small muted">{{ r.kind }}{% if r.primary %} <span class="badge">groupe principal</span>{% endif %}</td>
+      <td class="small mono">{{ r.detail }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% if rows.is_empty() %}<div class="empty">Aucun membre.</div>{% endif %}
+  </div>
+  </form>
+</div>

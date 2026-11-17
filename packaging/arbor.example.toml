@@ -1,0 +1,81 @@
+# Arbor — configuration
+# Documentation complète : README.md
+
+[server]
+listen = "0.0.0.0:8443"
+# "self-signed" (généré dans data_dir), "files" (tls_cert/tls_key) ou "off" (derrière un reverse-proxy)
+tls = "self-signed"
+# tls_cert = "/etc/arbor/cert.pem"
+# tls_key  = "/etc/arbor/key.pem"
+data_dir = "data"
+trust_proxy_headers = false
+title = "Arbor"
+
+[security]
+session_idle_minutes = 30
+session_max_hours = 10
+max_login_failures = 10
+
+[audit]
+enabled = true
+# path = "data/audit.jsonl"
+
+# ---------------------------------------------------------------------------
+# Active Directory / Samba AD
+# ---------------------------------------------------------------------------
+[[directory]]
+id = "corp"
+name = "CORP — Active Directory"
+urls = ["ldaps://dc1.corp.example", "ldaps://dc2.corp.example"]
+flavor = "auto"            # auto | active-directory | samba | openldap | 389ds | generic
+# ca_file = "corp-root-ca.pem"
+tls_insecure = false
+timeout_secs = 15
+
+[directory.login]
+default_upn_suffix = "corp.example"
+# required_group = "CN=Arbor-Admins,OU=Groupes,DC=corp,DC=example"
+
+[directory.gpo]
+# Windows : chemin UNC ; Samba (Arbor installé sur le DC) : chemin local
+# sysvol_path = '\\corp.example\SYSVOL\corp.example\Policies'
+# sysvol_path = "/var/lib/samba/sysvol/corp.example/Policies"
+
+[directory.dns]
+provider = "auto"          # auto | ad | dnszone | none
+
+# Serveurs DHCP ISC Kea (API REST de kea-ctrl-agent)
+# [[directory.dhcp]]
+# id = "dhcp1"
+# name = "DHCP site principal"
+# url = "http://dhcp1.corp.example:8000"
+# service = "dhcp4"
+# username = "kea-api"
+# password = "secret"
+
+# ---------------------------------------------------------------------------
+# OpenLDAP / 389-DS
+# ---------------------------------------------------------------------------
+# [[directory]]
+# id = "lab"
+# name = "Lab — OpenLDAP"
+# urls = ["ldap://ldap.lab.example"]
+# starttls = true
+# base_dn = "dc=lab,dc=example"
+#
+# [directory.login]
+# user_filter = "(|(uid={user})(mail={user}))"
+# # lookup_bind_dn = "cn=lookup,ou=services,dc=lab,dc=example"
+# # lookup_bind_password = "..."
+#
+# [directory.posix]
+# group_style = "group-of-names"   # group-of-names | group-of-unique-names | posix-group | rfc2307bis
+# uid_number_start = 10000
+# gid_number_start = 10000
+# home_template = "/home/{uid}"
+# default_shell = "/bin/bash"
+# default_gid_number = 10000
+#
+# [directory.dns]
+# provider = "dnszone"
+# dnszone_base = "ou=dns,dc=lab,dc=example"

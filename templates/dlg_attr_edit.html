@@ -1,0 +1,32 @@
+{% import "macros.html" as m %}
+<dialog class="modal">
+  <form class="dlg-form" hx-post="/attrs/edit" hx-swap="none">
+  <input type="hidden" name="dn" value="{{ dn }}">
+  <div class="dlg-head"><h2>{% call m::icon("edit") %}{% endcall %}<span>{% if attr.is_empty() %}Ajouter un attribut{% else %}Modifier « {{ attr }} »{% endif %}</span></h2><button type="button" class="icon-btn" data-close>{% call m::icon("close") %}{% endcall %}</button></div>
+  <div class="dlg-body">
+    <div class="form-grid">
+      <label>Attribut</label>
+      {% if attr.is_empty() %}
+      <input type="text" name="attr" list="attr-list-{{ uid }}" required autofocus placeholder="nom de l'attribut">
+      <datalist id="attr-list-{{ uid }}">{% for a in candidates %}<option value="{{ a }}">{% endfor %}</datalist>
+      {% else %}
+      <input type="text" name="attr" value="{{ attr }}" readonly>
+      {% endif %}
+      <label>Syntaxe</label><div class="muted">{{ syntax }}{% if single %} · valeur unique{% else %} · multi-valué{% endif %}</div>
+      <label>Format</label>
+      <select name="format">
+        <option value="text" {% if !binary %}selected{% endif %}>Texte (une valeur par ligne)</option>
+        <option value="hex" {% if binary %}selected{% endif %}>Hexadécimal (une valeur par ligne)</option>
+        <option value="base64">Base64 (une valeur par ligne)</option>
+      </select>
+      <div class="full"><textarea name="values" class="mono" rows="10" {% if !attr.is_empty() %}autofocus{% endif %}>{{ values }}</textarea></div>
+    </div>
+    <p class="small muted">Laisser vide pour supprimer toutes les valeurs. Les modifications sont appliquées par une opération LDAP « replace ».</p>
+  </div>
+  <div class="dlg-foot">
+    {% if !attr.is_empty() %}<button type="button" class="btn-danger" hx-post="/attrs/delete?dn={{ dn|urlencode }}&attr={{ attr|urlencode }}" hx-swap="none" hx-confirm="Supprimer toutes les valeurs de {{ attr }} ?">Effacer</button><span class="spacer"></span>{% endif %}
+    <button type="button" data-close>Annuler</button>
+    <button type="submit" class="btn-primary">Appliquer</button>
+  </div>
+  </form>
+</dialog>

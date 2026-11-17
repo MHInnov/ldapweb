@@ -1,0 +1,14 @@
+{% import "macros.html" as m %}
+<dialog class="modal wide" aria-label="Propriétés de {{ p.name }}">
+  <div class="dlg-head" style="display:block">
+    <div class="row" style="align-items:flex-start">
+      <div class="grow">{% include "props_inner.html" %}</div>
+      <a class="btn btn-sm btn-ghost" href="/obj?dn={{ p.dn|urlencode }}" title="Ouvrir dans une page">↗</a>
+      <button class="icon-btn" data-close aria-label="Fermer">{% call m::icon("close") %}{% endcall %}</button>
+    </div>
+  </div>
+  <nav class="tabs" role="tablist">
+    {% for t in p.tabs %}<button data-tab role="tab" hx-get="/obj/tab?dn={{ p.dn|urlencode }}&tab={{ t.0 }}" hx-target="#tb-{{ p.uid }}" class="{% if t.0 == p.active %}active{% endif %}">{{ t.1 }}</button>{% endfor %}
+  </nav>
+  <div class="dlg-body" id="tb-{{ p.uid }}" style="min-height:360px">{{ p.body|safe }}</div>
+</dialog>

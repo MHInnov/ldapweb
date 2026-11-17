@@ -1,0 +1,31 @@
+{% import "macros.html" as m %}
+<div id="attrs-{{ uid }}">
+  <div class="row" style="margin-bottom:10px">
+    <input type="search" placeholder="Filtrer les attributs…" style="max-width:260px" data-filter-table="#at-{{ uid }}">
+    <span class="spacer"></span>
+    {% if show_unset %}
+    <button class="btn-sm" hx-get="/obj/tab?dn={{ dn|urlencode }}&tab=attrs" hx-target="#attrs-{{ uid }}" hx-swap="outerHTML">Masquer les attributs vides</button>
+    {% else %}
+    <button class="btn-sm" hx-get="/obj/tab?dn={{ dn|urlencode }}&tab=attrs&unset=1" hx-target="#attrs-{{ uid }}" hx-swap="outerHTML">Afficher les attributs possibles non définis</button>
+    {% endif %}
+    <button class="btn-sm" hx-get="/attrs/edit?dn={{ dn|urlencode }}&attr=" hx-target="#modal2">{% call m::icon("plus") %}{% endcall %} Ajouter un attribut</button>
+  </div>
+  <div class="table-wrap" style="max-height:480px">
+  <table class="grid compact attrs" id="at-{{ uid }}">
+    <thead><tr><th>Attribut</th><th>Syntaxe</th><th>Valeur(s)</th><th></th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+    <tr class="{% if r.unset %}unset{% endif %}" data-name="{{ r.name|lower }}">
+      <td class="attr">{{ r.name }}{% if r.must %} <span class="badge">obligatoire</span>{% endif %}{% if r.readonly %} <span class="badge">système</span>{% endif %}</td>
+      <td class="small muted nowrap">{{ r.syntax }}</td>
+      <td class="val">{% if r.unset %}<span class="faint">&lt;non défini&gt;</span>{% else %}<ul class="val-list">{% for v in r.values %}<li>{{ v }}</li>{% endfor %}{% if r.more > 0 %}<li class="faint">… et {{ r.more }} autre(s)</li>{% endif %}</ul>{% endif %}</td>
+      <td class="right nowrap">
+        {% if r.binary && !r.unset %}<a class="btn btn-sm btn-ghost" href="/attrs/download?dn={{ dn|urlencode }}&attr={{ r.name|urlencode }}" hx-boost="false" title="Télécharger">{% call m::icon("download") %}{% endcall %}</a>{% endif %}
+        {% if !r.readonly %}<button class="btn-sm btn-ghost" hx-get="/attrs/edit?dn={{ dn|urlencode }}&attr={{ r.name|urlencode }}" hx-target="#modal2" title="Modifier">{% call m::icon("edit") %}{% endcall %}</button>{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>

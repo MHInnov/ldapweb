@@ -1,0 +1,20 @@
+{% import "macros.html" as m %}
+<form hx-post="/obj/account?dn={{ dn|urlencode }}" hx-target="this" hx-swap="outerHTML">
+  <div class="row wrap" style="margin-bottom:12px">
+    {% if disabled %}<span class="badge muted">Compte désactivé</span>{% else %}<span class="badge ok">Compte actif</span>{% endif %}
+    {% if locked %}<span class="badge danger">Verrouillé</span> <button type="button" class="btn-sm" hx-post="/obj/state?op=unlock&dn={{ dn|urlencode }}" hx-swap="none">{% call m::icon("unlock") %}{% endcall %} Déverrouiller</button>{% endif %}
+  </div>
+  <div class="checks">
+    <label><input type="checkbox" name="must_change" {% if must_change %}checked{% endif %}> L'utilisateur doit changer le mot de passe à la prochaine connexion (pwdReset)</label>
+  </div>
+  <div class="form-grid" style="margin-top:12px">
+    <label>Stratégie de mot de passe</label>
+    <select name="policy">
+      <option value="">(stratégie par défaut)</option>
+      {% for p in policies %}<option value="{{ p }}" {% if *p == policy %}selected{% endif %}>{{ p }}</option>{% endfor %}
+    </select>
+  </div>
+  <h3>Informations</h3>
+  <dl class="kv">{% for r in facts %}<dt>{{ r.0 }}</dt><dd>{{ r.1 }}</dd>{% endfor %}</dl>
+  <div class="form-actions"><button type="submit" class="btn-primary">Enregistrer</button></div>
+</form>

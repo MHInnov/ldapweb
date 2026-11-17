@@ -1,0 +1,10 @@
+{% import "macros.html" as m %}
+{% for n in nodes %}
+<li>
+  <details {% if n.leaf %}class="leaf"{% else %}hx-get="{{ n.children_url }}" hx-trigger="toggle once" hx-target="find ul" hx-swap="innerHTML"{% endif %} {% if n.open %}open{% endif %}>
+    <summary><span class="twisty">{% call m::icon("chevron") %}{% endcall %}</span><a class="node{% if n.current %} current{% endif %}" href="{{ n.href }}" hx-get="{{ n.click_url }}" hx-target="{{ n.click_target }}" hx-swap="{{ n.click_swap }}" hx-push-url="{{ n.push_url }}" title="{{ n.dn }}">{% call m::kicon(n.icon) %}{% endcall %}<span>{{ n.name }}</span></a></summary>
+    <ul>{% if n.open %}{{ n.children|safe }}{% else %}<li class="tree-loading">chargement…</li>{% endif %}</ul>
+  </details>
+</li>
+{% endfor %}
+{% if nodes.is_empty() && show_empty %}<li class="tree-loading">(aucun sous-conteneur)</li>{% endif %}

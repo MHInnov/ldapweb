@@ -1,0 +1,52 @@
+{% import "macros.html" as m %}
+<section class="list-pane" id="list" data-selection-scope hx-get="/dir/list?dn={{ dn|urlencode }}&q={{ q|urlencode }}" hx-trigger="refresh-list from:body" hx-swap="outerHTML">
+  <div class="toolbar">
+    <nav class="breadcrumb" aria-label="Emplacement">
+      {% for b in crumbs %}{% if !loop.first %}<span class="sep">›</span>{% endif %}<a href="/dir?dn={{ b.0|urlencode }}" hx-get="/dir/list?dn={{ b.0|urlencode }}" hx-target="#list" hx-swap="outerHTML" hx-push-url="/dir?dn={{ b.0|urlencode }}">{{ b.1 }}</a>{% endfor %}
+    </nav>
+    <div class="spacer"></div>
+    <input type="search" name="q" value="{{ q }}" placeholder="Filtrer ce conteneur…" hx-get="/dir/list?dn={{ dn|urlencode }}" hx-trigger="input changed delay:350ms, search" hx-target="#list" hx-swap="outerHTML" aria-label="Filtrer">
+  </div>
+  <div class="toolbar">
+    <details class="menu">
+      <summary class="btn btn-primary">{% call m::icon("plus") %}{% endcall %} Nouveau</summary>
+      <div class="menu-items">
+        <button hx-get="/obj/new?type=user&parent={{ dn|urlencode }}" hx-target="#modal">{% call m::kicon("user") %}{% endcall %} Utilisateur</button>
+        <button hx-get="/obj/new?type=group&parent={{ dn|urlencode }}" hx-target="#modal">{% call m::kicon("group") %}{% endcall %} Groupe</button>
+        <button hx-get="/obj/new?type=ou&parent={{ dn|urlencode }}" hx-target="#modal">{% call m::kicon("ou") %}{% endcall %} Unité d'organisation</button>
+        {% if is_ad %}<button hx-get="/obj/new?type=computer&parent={{ dn|urlencode }}" hx-target="#modal">{% call m::kicon("computer") %}{% endcall %} Ordinateur</button>{% endif %}
+        <button hx-get="/obj/new?type=contact&parent={{ dn|urlencode }}" hx-target="#modal">{% call m::kicon("contact") %}{% endcall %} Contact</button>
+      </div>
+    </details>
+    <button hx-get="/obj/props?dn={{ dn|urlencode }}" hx-target="#modal" title="Propriétés du conteneur">{% call m::icon("edit") %}{% endcall %} Propriétés</button>
+    <span class="sep"></span>
+    <button data-needs-selection disabled hx-post="/obj/state?op=enable" hx-include="#list-form" hx-swap="none">{% call m::icon("power") %}{% endcall %} Activer</button>
+    <button data-needs-selection disabled hx-post="/obj/state?op=disable" hx-include="#list-form" hx-swap="none">{% call m::icon("power") %}{% endcall %} Désactiver</button>
+    <button data-needs-selection disabled hx-get="/pick?mode=multi&kinds=group&action=/obj/memberof%3Fop%3Dadd&title=Ajouter%20aux%20groupes" hx-include="#list-form" hx-target="#modal">{% call m::icon("group") %}{% endcall %} Ajouter à un groupe</button>
+    <button data-needs-selection disabled hx-get="/obj/move" hx-include="#list-form" hx-target="#modal">{% call m::icon("move") %}{% endcall %} Déplacer</button>
+    <button data-needs-selection disabled class="btn-danger" hx-get="/obj/delete" hx-include="#list-form" hx-target="#modal">{% call m::icon("trash") %}{% endcall %} Supprimer</button>
+    <div class="spacer"></div>
+    <button class="icon-btn" title="Actualiser" hx-get="/dir/list?dn={{ dn|urlencode }}&q={{ q|urlencode }}" hx-target="#list" hx-swap="outerHTML">{% call m::icon("refresh") %}{% endcall %}</button>
+  </div>
+  <div class="list-body">
+    <form id="list-form">
+    <table class="grid" data-selectable>
+      <thead><tr><th class="chk"><input type="checkbox" data-action="select-all" aria-label="Tout sélectionner"></th><th>Nom</th><th>Type</th><th>Description</th><th>Identifiant</th><th>État</th></tr></thead>
+      <tbody>
+      {% for r in rows %}
+      <tr data-open="{{ r.open_url }}" data-open-target="{{ r.open_target }}" data-open-swap="{{ r.open_swap }}">
+        <td class="chk"><input type="checkbox" name="dn" value="{{ r.dn }}" aria-label="Sélectionner"></td>
+        <td><span class="name">{% call m::kicon(r.icon) %}{% endcall %}<a class="obj-name" hx-get="/obj/props?dn={{ r.dn|urlencode }}" hx-target="#modal">{{ r.name }}</a></span></td>
+        <td class="small muted nowrap">{{ r.kind }}</td>
+        <td class="small">{{ r.description }}</td>
+        <td class="small mono">{{ r.login }}</td>
+        <td>{% for b in r.badges %}<span class="badge {{ b.0 }}">{{ b.1 }}</span> {% endfor %}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </form>
+    {% if rows.is_empty() %}<div class="empty">Ce conteneur est vide{% if !q.is_empty() %} (ou aucun objet ne correspond au filtre){% endif %}.</div>{% endif %}
+  </div>
+  <div class="list-foot"><span>{{ rows.len() }} objet(s){% if truncated %} — liste tronquée, affinez le filtre{% endif %}</span><span data-selection-count></span></div>
+</section>

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div class="grow">
+    <h1>{{ domain }}</h1>
+    <div class="muted">{{ vendor }} · base <span class="mono">{{ base_dn }}</span></div>
+  </div>
+  <a class="btn" href="/dir">{% call m::icon("tree") %}{% endcall %} Utilisateurs et ordinateurs</a>
+  <a class="btn" href="/search">{% call m::icon("search") %}{% endcall %} Recherche</a>
+</div>
+<div id="stats" hx-get="/dashboard/stats" hx-trigger="load" hx-swap="outerHTML">
+  <div class="stats">{% for _i in 0..6 %}<div class="stat"><div class="v faint">…</div><div class="l">chargement</div></div>{% endfor %}</div>
+</div>
+<div class="cards">
+  <section class="card">
+    <h2>{% call m::icon("server") %}{% endcall %} Serveur</h2>
+    <dl class="kv">
+      {% for row in server %}<dt>{{ row.0 }}</dt><dd>{{ row.1 }}</dd>{% endfor %}
+    </dl>
+  </section>
+  {% if !fsmo.is_empty() %}
+  <section class="card">
+    <h2>{% call m::icon("shield") %}{% endcall %} Rôles FSMO</h2>
+    <dl class="kv">
+      {% for row in fsmo %}<dt>{{ row.0 }}</dt><dd class="mono">{{ row.1 }}</dd>{% endfor %}
+    </dl>
+  </section>
+  {% endif %}
+  {% if !dcs.is_empty() %}
+  <section class="card">
+    <h2>{% call m::icon("domain") %}{% endcall %} Contrôleurs de domaine</h2>
+    <table class="grid compact"><thead><tr><th>Nom</th><th>Système</th></tr></thead><tbody>
+    {% for dc in dcs %}<tr><td class="mono">{{ dc.0 }}</td><td class="small">{{ dc.1 }}</td></tr>{% endfor %}
+    </tbody></table>
+  </section>
+  {% endif %}
+  <section class="card">
+    <h2>{% call m::icon("user") %}{% endcall %} Session</h2>
+    <dl class="kv">
+      {% for row in session %}<dt>{{ row.0 }}</dt><dd>{{ row.1 }}</dd>{% endfor %}
+    </dl>
+  </section>
+</div>
+<h2 style="margin-top:24px">Contrôles de santé et de sécurité</h2>
+<div id="health" hx-get="/dashboard/health" hx-trigger="load" hx-swap="outerHTML"><div class="card muted">Analyse en cours…</div></div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% import "macros.html" as m %}
+<div data-selection-scope>
+  <div class="row" style="margin-bottom:10px">
+    <button class="btn-sm btn-primary" hx-get="/pick?mode=multi&kinds=group&action={{ add_action|urlencode }}&title=Ajouter%20aux%20groupes" hx-target="#modal2">{% call m::icon("plus") %}{% endcall %} Ajouter à un groupe…</button>
+    <button class="btn-sm btn-danger" data-needs-selection disabled hx-post="/obj/memberof?op=remove&obj={{ dn|urlencode }}" hx-include="#mo-{{ uid }}" hx-swap="none" hx-confirm="Retirer des groupes sélectionnés ?">{% call m::icon("trash") %}{% endcall %} Retirer</button>
+    <span class="spacer"></span>
+    {% if is_ad %}
+      {% if nested %}<button class="btn-sm" hx-get="/obj/tab?dn={{ dn|urlencode }}&tab=memberof" hx-target="closest .dlg-body, closest .tab-body">Appartenance directe</button>
+      {% else %}<button class="btn-sm" hx-get="/obj/tab?dn={{ dn|urlencode }}&tab=memberof&nested=1" hx-target="closest .dlg-body, closest .tab-body">Appartenance effective (imbriquée)</button>{% endif %}
+    {% endif %}
+  </div>
+  {% if nested %}<div class="notice">Appartenance effective : groupes directs et groupes imbriqués (LDAP_MATCHING_RULE_IN_CHAIN).</div>{% endif %}
+  <form id="mo-{{ uid }}">
+  <div class="table-wrap" style="max-height:420px">
+  <table class="grid compact" data-selectable>
+    <thead><tr><th class="chk"><input type="checkbox" data-action="select-all"></th><th>Groupe</th><th>Détail</th><th>Emplacement</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+    <tr>
+      <td class="chk">{% if !r.primary && !nested %}<input type="checkbox" name="dn" value="{{ r.dn }}">{% endif %}</td>
+      <td><span class="name">{% call m::kicon("group") %}{% endcall %}<a class="obj-name" hx-get="/obj/props?dn={{ r.dn|urlencode }}" hx-target="#modal2">{{ r.name }}</a></span></td>
+      <td class="small muted">{{ r.detail }}</td>
+      <td class="small muted">{{ r.location }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% if rows.is_empty() %}<div class="empty">Membre d'aucun groupe.</div>{% endif %}
+  </div>
+  </form>
+</div>

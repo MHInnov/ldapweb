@@ -1,0 +1,23 @@
+{% import "macros.html" as m %}
+<div class="row" style="margin-bottom:8px">
+  <strong>{{ rows.len() }} résultat(s)</strong>{% if truncated %} <span class="badge warn">limité à {{ limit }}</span>{% endif %}
+  <span class="muted small mono" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ filter }}</span>
+  <span class="spacer"></span>
+  <a class="btn btn-sm" href="/search/export.csv?{{ query }}" hx-boost="false">{% call m::icon("download") %}{% endcall %} CSV</a>
+</div>
+<div class="table-wrap" style="max-height:70vh">
+<table class="grid compact">
+  <thead><tr><th>Nom</th><th>Type</th><th>Emplacement</th>{% for c in columns %}<th>{{ c }}</th>{% endfor %}</tr></thead>
+  <tbody>
+  {% for r in rows %}
+  <tr>
+    <td><span class="name">{% call m::kicon(r.icon) %}{% endcall %}<a class="obj-name" hx-get="/obj/props?dn={{ r.dn|urlencode }}" hx-target="#modal">{{ r.name }}</a></span></td>
+    <td class="small muted nowrap">{{ r.kind }}{% for b in r.badges %} <span class="badge {{ b.0 }}">{{ b.1 }}</span>{% endfor %}</td>
+    <td class="small muted"><a href="/dir?dn={{ r.parent|urlencode }}" class="muted">{{ r.location }}</a></td>
+    {% for v in r.cols %}<td class="small">{{ v }}</td>{% endfor %}
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% if rows.is_empty() %}<div class="empty">Aucun objet ne correspond.</div>{% endif %}
+</div>

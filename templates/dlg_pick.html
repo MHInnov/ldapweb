@@ -1,0 +1,17 @@
+{% import "macros.html" as m %}
+<dialog class="modal">
+  {% if mode == "multi" %}<form class="dlg-form" hx-post="{{ action }}" hx-swap="none">{% for d in carry %}<input type="hidden" name="dn" value="{{ d }}">{% endfor %}{% endif %}
+  <div class="dlg-head"><h2>{% call m::icon("search") %}{% endcall %}<span>{{ title }}</span></h2><button type="button" class="icon-btn" data-close>{% call m::icon("close") %}{% endcall %}</button></div>
+  <div class="dlg-body">
+    <div class="row" style="margin-bottom:10px">
+      <input type="search" name="q" placeholder="Nom, identifiant ou adresse (au moins 1 caractère)…" autofocus
+        hx-get="/pick/search?mode={{ mode }}&kinds={{ kinds|urlencode }}&target={{ target|urlencode }}" hx-trigger="input changed delay:300ms, search, load" hx-target="#pick-res-{{ uid }}" hx-include="this">
+    </div>
+    {% if carry.len() > 0 %}<p class="small muted">{{ carry.len() }} objet(s) sélectionné(s) dans la liste.</p>{% endif %}
+    <div id="pick-res-{{ uid }}" class="table-wrap" style="max-height:380px;min-height:120px"></div>
+  </div>
+  {% if mode == "multi" %}
+  <div class="dlg-foot"><button type="button" data-close>Annuler</button><button type="submit" class="btn-primary">Ajouter la sélection</button></div>
+  </form>
+  {% endif %}
+</dialog>

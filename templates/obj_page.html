@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ p.name }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <nav class="breadcrumb grow">{% for b in crumbs %}{% if !loop.first %}<span class="sep">›</span>{% endif %}<a href="/dir?dn={{ b.0|urlencode }}">{{ b.1 }}</a>{% endfor %}</nav>
+</div>
+<div class="page-props">
+  <div class="props-head-wrap">{% include "props_inner.html" %}</div>
+  <nav class="tabs" role="tablist">
+    {% for t in p.tabs %}<button data-tab role="tab" hx-get="/obj/tab?dn={{ p.dn|urlencode }}&tab={{ t.0 }}" hx-target="#tb-{{ p.uid }}" class="{% if t.0 == p.active %}active{% endif %}">{{ t.1 }}</button>{% endfor %}
+  </nav>
+  <div class="tab-body" id="tb-{{ p.uid }}">{{ p.body|safe }}</div>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% import "macros.html" as m %}
+<div id="health" class="table-wrap">
+<table class="grid">
+<thead><tr><th style="width:110px">État</th><th>Contrôle</th><th>Résultat</th><th></th></tr></thead>
+<tbody>
+{% for c in checks %}
+<tr>
+  <td><span class="badge {{ c.level }}">{% if c.level == "ok" %}{% call m::icon("check") %}{% endcall %} OK{% else if c.level == "danger" %}{% call m::icon("warn") %}{% endcall %} Critique{% else if c.level == "warn" %}{% call m::icon("warn") %}{% endcall %} Attention{% else %}Info{% endif %}</span></td>
+  <td>{{ c.title }}<div class="small muted">{{ c.hint }}</div></td>
+  <td>{{ c.result }}</td>
+  <td class="right">{% if !c.link.is_empty() %}<a class="btn btn-sm" href="{{ c.link }}">Voir</a>{% endif %}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Utilisateurs et ordinateurs{% endblock %}
+{% block main_class %}flush{% endblock %}
+{% block content %}
+<div class="split">
+  <aside class="tree-pane" aria-label="Arborescence">
+    <ul class="tree">{{ tree|safe }}</ul>
+  </aside>
+  {{ list|safe }}
+</div>
+{% endblock %}

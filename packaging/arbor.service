@@ -1,0 +1,39 @@
+# /etc/systemd/system/arbor.service
+[Unit]
+Description=Arbor — console web d'administration d'annuaire
+Documentation=file:///usr/share/doc/arbor/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=arbor
+Group=arbor
+WorkingDirectory=/var/lib/arbor
+ExecStart=/usr/local/bin/arbor -c /etc/arbor/arbor.toml run
+Restart=on-failure
+RestartSec=5
+Environment=RUST_LOG=info
+
+# Durcissement
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictNamespaces=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+ReadWritePaths=/var/lib/arbor
+# Arbor installé sur un DC Samba avec gpo.sysvol_path local :
+# ReadWritePaths=/var/lib/samba/sysvol
+# Écoute sur un port < 1024 (ex. 443) :
+# AmbientCapabilities=CAP_NET_BIND_SERVICE
+# CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+
+[Install]
+WantedBy=multi-user.target

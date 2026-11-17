@@ -1,0 +1,56 @@
+{% import "macros.html" as m %}<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="htmx-config" content='{"allowEval":false,"includeIndicatorStyles":false,"historyCacheSize":0,"selfRequestsOnly":true,"scrollIntoViewOnBoost":false,"disableInheritance":true}'>
+<meta name="csrf-token" content="{{ ctx.csrf }}">
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<title>{% block title %}{% endblock %} — {{ ctx.app_title }}</title>
+<link rel="stylesheet" href="/static/app.css?v={{ ctx.version }}">
+<script src="/static/app.js?v={{ ctx.version }}"></script>
+<script src="/static/htmx.min.js?v={{ ctx.version }}" defer></script>
+</head>
+<body hx-boost="true" hx-inherit="hx-boost">
+<div id="progress"></div>
+<header class="topbar">
+  <a class="brand" href="/dashboard"><span class="logo"><svg><use href="/static/icons.svg#logo"></use></svg></span>{{ ctx.app_title }}</a>
+  <span class="conn"><span class="badge flavor-{{ ctx.flavor_short }}">{{ ctx.flavor }}</span><span>{{ ctx.profile_name }}</span><span class="faint">·</span><span class="mono">{{ ctx.server }}</span></span>
+  <div class="spacer"></div>
+  <form class="quicksearch" action="/search" method="get" hx-boost="true"><input type="search" name="q" placeholder="Rechercher un objet… ( / )" aria-label="Recherche rapide"></form>
+  <button class="icon-btn" data-action="theme" title="Basculer clair / sombre" hx-boost="false">{% call m::icon("sun") %}{% endcall %}</button>
+  <span class="user" title="Utilisateur connecté">{% call m::icon("user") %}{% endcall %} {{ ctx.user }}</span>
+  <button class="btn-ghost" hx-post="/logout" hx-swap="none" title="Se déconnecter">{% call m::icon("logout") %}{% endcall %}</button>
+</header>
+<div class="shell">
+<nav class="sidenav" aria-label="Navigation">
+  <a href="/dashboard" class="{% if ctx.nav == "dashboard" %}active{% endif %}">{% call m::icon("dashboard") %}{% endcall %} Tableau de bord</a>
+  <div class="navgroup">Annuaire</div>
+  <a href="/dir" class="{% if ctx.nav == "dir" %}active{% endif %}">{% call m::icon("tree") %}{% endcall %} Utilisateurs et ordinateurs</a>
+  <a href="/search" class="{% if ctx.nav == "search" %}active{% endif %}">{% call m::icon("search") %}{% endcall %} Recherche</a>
+  <a href="/browse" class="{% if ctx.nav == "browse" %}active{% endif %}">{% call m::icon("object") %}{% endcall %} Explorateur LDAP</a>
+  {% if ctx.is_ad %}<a href="/recycle" class="{% if ctx.nav == "recycle" %}active{% endif %}">{% call m::icon("recycle") %}{% endcall %} Objets supprimés</a>{% endif %}
+  <div class="navgroup">Services</div>
+  {% if ctx.has_dns %}<a href="/dns" class="{% if ctx.nav == "dns" %}active{% endif %}">{% call m::icon("dns") %}{% endcall %} DNS</a>{% endif %}
+  {% if ctx.has_dhcp %}<a href="/dhcp" class="{% if ctx.nav == "dhcp" %}active{% endif %}">{% call m::icon("dhcp") %}{% endcall %} DHCP</a>{% endif %}
+  {% if ctx.is_ad %}<a href="/gpo" class="{% if ctx.nav == "gpo" %}active{% endif %}">{% call m::icon("gpo") %}{% endcall %} Stratégies de groupe</a>{% endif %}
+  <a href="/kerberos" class="{% if ctx.nav == "kerberos" %}active{% endif %}">{% call m::icon("key") %}{% endcall %} Kerberos</a>
+  <a href="/pki" class="{% if ctx.nav == "pki" %}active{% endif %}">{% call m::icon("cert") %}{% endcall %} Certificats (PKI)</a>
+  <div class="navgroup">Domaine</div>
+  {% if ctx.is_ad %}
+  <a href="/sites" class="{% if ctx.nav == "sites" %}active{% endif %}">{% call m::icon("site") %}{% endcall %} Sites et services</a>
+  <a href="/trusts" class="{% if ctx.nav == "trusts" %}active{% endif %}">{% call m::icon("trust") %}{% endcall %} Domaines et approbations</a>
+  {% endif %}
+  <a href="/policies" class="{% if ctx.nav == "policies" %}active{% endif %}">{% call m::icon("policy") %}{% endcall %} Stratégies de mot de passe</a>
+  <a href="/schema" class="{% if ctx.nav == "schema" %}active{% endif %}">{% call m::icon("schema") %}{% endcall %} Schéma</a>
+  <a href="/audit" class="{% if ctx.nav == "audit" %}active{% endif %}">{% call m::icon("log") %}{% endcall %} Journal d'audit</a>
+  <div class="navgroup">Affichage</div>
+  <a href="#" hx-post="/prefs/advanced" hx-swap="none">{% call m::icon("object") %}{% endcall %} Fonctionnalités avancées{% if ctx.advanced %} ✓{% endif %}</a>
+</nav>
+<main id="main" class="{% block main_class %}{% endblock %}">{% block content %}{% endblock %}</main>
+</div>
+<div id="modal"></div>
+<div id="modal2"></div>
+<div id="toasts" aria-live="polite"></div>
+</body>
+</html>

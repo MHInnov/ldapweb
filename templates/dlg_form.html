@@ -1,0 +1,8 @@
+{% import "macros.html" as m %}
+<dialog class="modal {{ size }}">
+  <form class="dlg-form" hx-post="{{ action }}" hx-swap="{{ swap }}" {% if !target.is_empty() %}hx-target="{{ target }}"{% endif %} autocomplete="off">
+  <div class="dlg-head"><h2>{% call m::icon(icon) %}{% endcall %}<span>{{ title }}</span></h2><button type="button" class="icon-btn" data-close>{% call m::icon("close") %}{% endcall %}</button></div>
+  <div class="dlg-body">{{ body|safe }}</div>
+  <div class="dlg-foot"><button type="button" data-close>{{ cancel }}</button>{% if !submit.is_empty() %}<button type="submit" class="btn-primary">{{ submit }}</button>{% endif %}</div>
+  </form>
+</dialog>

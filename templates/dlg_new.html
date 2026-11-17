@@ -1,0 +1,89 @@
+{% import "macros.html" as m %}
+<dialog class="modal">
+  <form class="dlg-form" hx-post="/obj/new" hx-swap="none" autocomplete="off">
+  <input type="hidden" name="type" value="{{ kind }}">
+  <input type="hidden" name="parent" value="{{ parent }}">
+  <div class="dlg-head"><h2>{% call m::kicon(icon) %}{% endcall %}<span>Nouvel objet — {{ title }}</span></h2><button type="button" class="icon-btn" data-close>{% call m::icon("close") %}{% endcall %}</button></div>
+  <div class="dlg-body">
+    <p class="small muted">Créer dans : <span class="mono">{{ parent_label }}</span></p>
+    {% if kind == "user" %}
+    <div class="form-grid">
+      <label>Prénom</label><input type="text" name="given" autofocus>
+      <label>Initiales</label><input type="text" name="initials" maxlength="6" style="max-width:100px">
+      <label>Nom</label><input type="text" name="sn">
+      <label>Nom complet</label><input type="text" name="full_name" placeholder="par défaut : Prénom Nom">
+      <label>Nom d'ouverture de session</label>
+      {% if is_ad %}
+      <div class="inline"><input type="text" name="login" required maxlength="20"><span>@</span><select name="upn_suffix" style="max-width:240px">{% for s in suffixes %}<option>{{ s }}</option>{% endfor %}</select></div>
+      {% else %}
+      <input type="text" name="login" required placeholder="uid">
+      {% endif %}
+      <label>Adresse de messagerie</label><input type="email" name="mail">
+      <label>Description</label><input type="text" name="description">
+      <label for="pw1-{{ uid }}">Mot de passe</label>
+      <div class="inline"><input type="password" name="password" id="pw1-{{ uid }}" autocomplete="new-password"><button type="button" class="btn-sm" data-action="genpw" data-targets="pw1-{{ uid }},pw2-{{ uid }}">Générer</button></div>
+      <label for="pw2-{{ uid }}">Confirmer</label><input type="password" name="password2" id="pw2-{{ uid }}" autocomplete="new-password">
+    </div>
+    <div class="checks" style="margin-top:12px">
+      <label><input type="checkbox" name="must_change" checked> L'utilisateur doit changer le mot de passe à la prochaine ouverture de session</label>
+      {% if is_ad %}<label><input type="checkbox" name="never_expires"> Le mot de passe n'expire jamais</label>{% endif %}
+      <label><input type="checkbox" name="disabled"> Le compte est désactivé</label>
+      <label><input type="checkbox" name="posix" {% if posix_default %}checked{% endif %}> Attributs POSIX (uidNumber, gidNumber, répertoire, shell)</label>
+    </div>
+    <fieldset style="margin-top:12px"><legend>POSIX (si coché)</legend>
+      <div class="form-grid">
+        <label>uidNumber</label><input type="number" name="uid_number" placeholder="automatique ({{ next_uid_hint }})">
+        <label>gidNumber</label><input type="number" name="gid_number" value="{{ default_gid }}" placeholder="groupe principal">
+        <label>Répertoire de base</label><input type="text" name="home" value="{{ home_template }}">
+        <label>Shell</label><input type="text" name="shell" value="{{ shell }}">
+      </div>
+    </fieldset>
+    {% else if kind == "group" %}
+    <div class="form-grid">
+      <label>Nom du groupe</label><input type="text" name="name" required autofocus>
+      {% if is_ad %}
+      <label>Nom (antérieur à Windows 2000)</label><input type="text" name="sam" placeholder="par défaut : nom du groupe">
+      <label>Étendue et type</label>
+      <select name="group_type">
+        <option value="-2147483646" selected>Globale — Sécurité</option>
+        <option value="-2147483644">Domaine local — Sécurité</option>
+        <option value="-2147483640">Universelle — Sécurité</option>
+        <option value="2">Globale — Distribution</option>
+        <option value="4">Domaine local — Distribution</option>
+        <option value="8">Universelle — Distribution</option>
+      </select>
+      <label>Adresse de messagerie</label><input type="email" name="mail">
+      {% else %}
+      <label>Type</label><div class="muted">{{ group_style }}</div>
+      {% endif %}
+      <label>Description</label><input type="text" name="description">
+      {% if is_ad || posix_default %}<label>gidNumber</label><input type="number" name="gid_number" placeholder="automatique si POSIX">{% endif %}
+    </div>
+    {% if is_ad %}
+    <div class="checks" style="margin-top:12px">
+      <label><input type="checkbox" name="posix" {% if posix_default %}checked{% endif %}> Attribuer un gidNumber (POSIX)</label>
+    </div>
+    {% endif %}
+    {% else if kind == "ou" %}
+    <div class="form-grid">
+      <label>Nom</label><input type="text" name="name" required autofocus>
+      <label>Description</label><input type="text" name="description">
+    </div>
+    {% else if kind == "computer" %}
+    <div class="form-grid">
+      <label>Nom de l'ordinateur</label><input type="text" name="name" required autofocus maxlength="15" style="text-transform:uppercase">
+      <label>Description</label><input type="text" name="description">
+    </div>
+    <p class="small muted">Le compte est pré-créé (sAMAccountName NOM$) pour une jonction ultérieure au domaine.</p>
+    {% else if kind == "contact" %}
+    <div class="form-grid">
+      <label>Prénom</label><input type="text" name="given" autofocus>
+      <label>Nom</label><input type="text" name="sn">
+      <label>Nom affiché</label><input type="text" name="display">
+      <label>Adresse de messagerie</label><input type="email" name="mail">
+    </div>
+    {% endif %}
+  </div>
+  <div class="dlg-foot"><button type="button" data-close>Annuler</button><button type="submit" class="btn-primary">Créer</button></div>
+  </form>
+</dialog>

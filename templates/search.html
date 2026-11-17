@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Recherche{% endblock %}
+{% block content %}
+<div class="page-head"><div class="grow"><h1>Recherche dans l'annuaire</h1><div class="muted">Requêtes enregistrées, recherche par nom ou filtre LDAP brut, export CSV.</div></div></div>
+<form class="card" hx-get="/search/results" hx-target="#results" hx-push-url="false" id="search-form">
+  <div class="form-grid">
+    <label>Requête prédéfinie</label>
+    <select name="preset">
+      <option value="">(aucune)</option>
+      {% for p in presets %}<option value="{{ p.0 }}" {% if p.0 == preset %}selected{% endif %}>{{ p.1 }}</option>{% endfor %}
+    </select>
+    <label>Nom contient</label><input type="search" name="q" value="{{ q }}" placeholder="nom, identifiant, adresse…">
+    <label>Type d'objet</label>
+    <select name="kind">
+      {% for k in kinds %}<option value="{{ k.0 }}" {% if k.0 == kind %}selected{% endif %}>{{ k.1 }}</option>{% endfor %}
+    </select>
+    <label>Filtre LDAP brut</label><input type="text" name="filter" value="{{ filter }}" class="mono" placeholder="ex. (&amp;(objectClass=user)(department=Ventes)) — prioritaire si renseigné">
+    <label>Base</label><input type="text" name="base" value="{{ base }}" class="mono">
+    <label>Étendue</label>
+    <select name="scope"><option value="sub" {% if scope == "sub" %}selected{% endif %}>Sous-arborescence</option><option value="one" {% if scope == "one" %}selected{% endif %}>Un niveau</option><option value="base" {% if scope == "base" %}selected{% endif %}>Objet de base</option></select>
+    <label>Colonnes (attributs)</label><input type="text" name="attrs" value="{{ attrs }}" class="mono" placeholder="ex. mail, department, lastLogonTimestamp">
+    <label>Inactivité (jours)</label><input type="number" name="days" value="{{ days }}" min="1" style="max-width:120px">
+  </div>
+  <div class="form-actions">
+    <button type="submit" class="btn-primary">Rechercher</button>
+  </div>
+</form>
+<div id="results" style="margin-top:16px" {% if autorun %}hx-get="/search/results?{{ query }}" hx-trigger="load"{% endif %}></div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Explorateur LDAP{% endblock %}
+{% block main_class %}flush{% endblock %}
+{% block content %}
+<div class="split">
+  <aside class="tree-pane" aria-label="Arborescence LDAP">
+    <ul class="tree">{{ tree|safe }}</ul>
+  </aside>
+  <section class="list-pane">
+    <div class="list-body" id="browse-detail" style="padding:16px 18px">{{ detail|safe }}</div>
+  </section>
+</div>
+{% endblock %}

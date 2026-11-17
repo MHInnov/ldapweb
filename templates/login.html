@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connexion — {{ title }}</title>
+<link rel="stylesheet" href="/static/app.css?v={{ version }}">
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<script src="/static/app.js?v={{ version }}"></script>
+</head>
+<body class="login-body">
+<div class="login-card">
+  <div class="brand"><span class="logo"><svg><use href="/static/icons.svg#logo"></use></svg></span>{{ title }}</div>
+  <div class="muted">Administration de l'annuaire et des services d'infrastructure</div>
+  {% if !error.is_empty() %}<div class="notice danger" role="alert" style="margin-top:14px">{{ error }}</div>{% endif %}
+  <form method="post" action="/login" autocomplete="on">
+    {% if profiles.len() > 1 %}
+    <label>Annuaire
+      <select name="profile">
+        {% for p in profiles %}<option value="{{ p.0 }}" {% if p.0 == selected %}selected{% endif %}>{{ p.1 }}</option>{% endfor %}
+      </select>
+    </label>
+    {% else %}
+      {% for p in profiles %}<input type="hidden" name="profile" value="{{ p.0 }}"><div class="badge accent">{{ p.1 }}</div>{% endfor %}
+    {% endif %}
+    <label>Identifiant
+      <input type="text" name="username" value="{{ username }}" placeholder="utilisateur, utilisateur@domaine ou DOMAINE\utilisateur" autocomplete="username" required autofocus>
+    </label>
+    <label>Mot de passe
+      <input type="password" name="password" autocomplete="current-password" required>
+    </label>
+    <button type="submit" class="btn-primary">Se connecter</button>
+  </form>
+  <div class="login-foot">Les opérations sont exécutées avec vos propres droits sur l'annuaire.<br>Arbor {{ version }}</div>
+</div>
+</body>
+</html>
